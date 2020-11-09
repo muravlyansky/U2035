@@ -11,7 +11,8 @@ SELECT 	ui.leaderID, const.day_n,
 			project_tags_user.market, project_tags_user.method, project_tags_user.tech, project_tags_user.task,
 			task_edu_user.Tasks_Created, task_edu_user.Tasks_Done, task_edu_user.Tasks_Validated, task_edu_user.EDUreq_Created, task_edu_user.EDUreq_Done,
 			req_user.axeleration_req, req_user.expert_req, req_user.lab_req, req_user.workshop_req, req_user.pitch_req,
-			aim_change.aim_changes, aim_fb.aim_feedbacks, event_fb.event_feedbacks
+			aim_change.aim_changes, aim_fb.aim_feedbacks, event_fb.event_feedbacks,products.products,
+			project_like.project_like,product_like.product_like
 FROM  labs.user_info AS ui 
 JOIN const
 LEFT JOIN ( 
@@ -103,7 +104,34 @@ LEFT JOIN (
 					) AS feedback_by_event
 				GROUP BY leaderID, day_n
 			) AS  event_fb
-		ON event_fb.leaderID=ui.leaderID	AND event_fb.day_n=const.day_n										
+		ON event_fb.leaderID=ui.leaderID	AND event_fb.day_n=const.day_n			
+LEFT JOIN (
+				SELECT ui.leaderID, const.day_n, COUNT(p.uuid) AS products
+				FROM edumap.product AS p 
+				JOIN const
+				LEFT JOIN edumap.user_info AS ui ON p.userID=ui.userID AND ui.leaderID IS NOT null
+				WHERE p.createDT>=const.day_n AND p.createDT<const.day_n+1 
+				GROUP BY ui.leaderID, const.day_n
+			 ) AS products
+		ON products.leaderID=ui.leaderID	AND products.day_n=const.day_n					
+LEFT JOIN (
+				SELECT ui.leaderID, const.day_n, COUNT(pr.id) AS project_like
+				FROM people.project_rating AS pr 
+				JOIN const
+				LEFT JOIN people.user_info AS ui ON pr.userID=ui.userID AND ui.leaderID IS NOT null
+				WHERE pr.createDT>=const.day_n AND pr.createDT<const.day_n+1 
+				GROUP BY ui.leaderID, const.day_n
+			 ) AS project_like
+		ON project_like.leaderID=ui.leaderID	AND project_like.day_n=const.day_n		
+LEFT JOIN (
+				SELECT ui.leaderID, const.day_n, COUNT(pur.createDT) AS product_like
+				FROM edumap.product_user_like AS pur 
+				JOIN const
+				LEFT JOIN edumap.user_info AS ui ON pur.userID=ui.userID AND ui.leaderID IS NOT null
+				WHERE pur.createDT>=const.day_n AND pur.createDT<const.day_n+1 
+				GROUP BY ui.leaderID, const.day_n
+			 ) AS product_like		
+		ON product_like.leaderID=ui.leaderID	AND product_like.day_n=const.day_n													
 WHERE ui.leaderID in
 (485453,	1651791,	1763835,	36694,	83592,	1578656,	339301,	1549642,	1135084,	474779,	1441162,	547916,	1598284,	1213499,	688,		608607,	477027,	1139596,	1146066,	237990,
 474811,	1564558,	1660183,	320437,	1844982,	1267617,	239714,	991815,	1676018,	685911,	836995,	74452,	716652,	40435,	1561513,	1030706,	1399757,	285185,	441225,	1528761,
