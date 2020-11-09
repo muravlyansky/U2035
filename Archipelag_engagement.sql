@@ -6,13 +6,26 @@ WITH const AS
 		SELECT   5 AS day_id, STR_TO_DATE("11 11 2020","%d %m %Y") AS day_n	   UNION
 		SELECT   6 AS day_id, STR_TO_DATE("12 11 2020","%d %m %Y") AS day_n
 	  )
-SELECT 	ui.leaderID, const.day_n,
-			project_presentation_user.presentations,
-			project_tags_user.market, project_tags_user.method, project_tags_user.tech, project_tags_user.task,
-			task_edu_user.Tasks_Created, task_edu_user.Tasks_Done, task_edu_user.Tasks_Validated, task_edu_user.EDUreq_Created, task_edu_user.EDUreq_Done,
-			req_user.axeleration_req, req_user.expert_req, req_user.lab_req, req_user.workshop_req, req_user.pitch_req,
-			aim_change.aim_changes, aim_fb.aim_feedbacks, event_fb.event_feedbacks,products.products,
-			project_like.project_like,product_like.product_like
+SELECT 	ui.leaderID, const.day_n AS День,
+			project_presentation_user.presentations AS 'Загружена в PT презентация по проекту',
+			project_tags_user.project_marked AS 'Проект в ПТ размечен', 
+			task_edu_user.Tasks_Created AS 'Участником создана задача в Командном профиле', 
+			task_edu_user.Tasks_Done AS 'Выполнена задача в ком.профиле', 
+			task_edu_user.Tasks_Validated AS 'Верифицировано решение в ком.профиле', 
+			task_edu_user.EDUreq_Created AS 'Создание Темы изучения в Ком.профиле', 
+			task_edu_user.EDUreq_Done AS 'Оценено продвижение к цели в ЛК',
+			req_user.axeleration_req AS 'Запись на Акслератор', 
+			req_user.expert_req AS 'Запись на встречу с экспертом', 
+			req_user.lab_req AS 'Запись на Лабораторию', 
+			req_user.workshop_req AS 'Запись на МК',  
+			req_user.effic_req AS 'Запись на повышение эффективности', 
+			req_user.pitch_req AS 'Запись на Питч-сессию',
+			aim_change.aim_changes AS 'Отредактирована цель', 
+			aim_fb.aim_feedbacks AS 'Оценено продвижение к цели в ЛК', 
+			event_fb.event_feedbacks AS 'Оставлен Фидбек на мероприятие (хотя бы один ответ)',
+			products.products AS 'Создан Продукт в Edumap',
+			project_like.project_like AS 'Поставлен лайк проекту в ПТ',
+			product_like.product_like AS 'Поставлен лайк продукту (карточке) в Edumap'
 FROM  labs.user_info AS ui 
 JOIN const
 LEFT JOIN ( 
@@ -33,7 +46,9 @@ LEFT JOIN (
 			) as project_presentation_user
 		ON project_presentation_user.leaderID=ui.leaderID AND project_presentation_user.day_n=const.day_n
 LEFT JOIN (
-					SELECT  ui.leaderID, const.day_n, 
+				SELECT leaderID, day_n, IF(market>0 AND method>0 AND tech>0 and task>0,1,0) AS project_marked
+				FROM (
+								SELECT  ui.leaderID, const.day_n, p.id AS p_id,
 								SUM(pt.type='market') AS market,	SUM(pt.type='method') AS method,	SUM(pt.type='tech') AS tech, SUM(pt.type='task') AS task
 								FROM const, people.project AS p
 								LEFT JOIN people.project_tag AS pt ON pt.projectID=p.id
@@ -42,7 +57,9 @@ LEFT JOIN (
 								LEFT JOIN people.team_user AS tu ON tu.teamID=prt.teamID
 								LEFT JOIN people.user_info AS ui ON ui.userID=tu.userID
 								WHERE ui.leaderID IS NOT NULL AND pt.createDT>=const.day_n AND  pt.createDT<const.day_n+1
-								GROUP BY ui.leaderID,  pt.createDT
+								GROUP BY ui.leaderID,  const.day_n, p.id
+						) AS projects_marked
+				GROUP BY leaderID,  day_n
 			) AS  project_tags_user
 		ON project_tags_user.leaderID=ui.leaderID	 AND project_tags_user.day_n=const.day_n
 LEFT JOIN (	
