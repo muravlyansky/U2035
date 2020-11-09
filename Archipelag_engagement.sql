@@ -1,6 +1,7 @@
 SELECT 	ui.leaderID, 
 			project_presentation_user.projects, project_presentation_user.presentations,
-			project_tags_user.market, project_tags_user.method, project_tags_user.tech, project_tags_user.task
+			project_tags_user.market, project_tags_user.method, project_tags_user.tech, project_tags_user.task,
+			task_edu_user.Tasks_Created, task_edu_user.Tasks_Done, task_edu_user.Tasks_Validated, task_edu_user.EDUreq_Created, task_edu_user.EDUreq_Done
 FROM labs.user_info AS ui 
 LEFT JOIN ( 
 			SELECT leaderID, COUNT(p_id) AS projects, SUM(presentations) AS presentations
@@ -37,7 +38,17 @@ LEFT JOIN (
 					) AS  project_tags_by_project_user
 			GROUP BY leaderID
 			) AS  project_tags_user
-		ON project_tags_user.leaderID=ui.leaderID		
+		ON project_tags_user.leaderID=ui.leaderID	
+LEFT JOIN (	SELECT ui.leaderID , 
+						SUM(sc.status='new' AND sc.type ='task_team') AS Tasks_Created,  SUM(sc.status='done' AND sc.type ='task_team') AS Tasks_Done, 
+						SUM(sc.status='validated' AND sc.type ='task_team') AS Tasks_Validated, SUM(sc.status='validated_error' AND sc.type ='task_team') AS Tasks_Validated_error,
+						SUM(sc.status='new' AND sc.type ='focus_team') AS EDUreq_Created,  SUM(sc.status='done' AND sc.type ='focus_team') AS EDUreq_Done
+				FROM ple.step_collection sc
+				LEFT JOIN ple.user_info ui ON sc.untiID=ui.untiID
+				WHERE sc.type IN ('task_team','focus_team')
+				GROUP BY ui.leaderID) AS  task_edu_user
+		ON task_edu_user.leaderID=ui.leaderID	
+					
 WHERE ui.leaderID in
 (485453	,	1651791	,	1763835	,	36694	,	83592	,	1578656	,	339301	,	1549642	,	1135084	,
 474779	,	1441162	,	547916	,	1598284	,	1213499	,	688	,	608607	,	477027	,	1139596	,
@@ -290,6 +301,3 @@ WHERE ui.leaderID in
 1502603	,	1692291	,	1511101	,	1515851	,	1601592	,	1712853	,	121902	,	1395052	,		
 1501938	,	1387373	,	1511098	,	1451149	,	1821998	,	1557104	,	350979	,	355304	)		
 GROUP BY ui.leaderID ;
-
-
-
