@@ -7,7 +7,7 @@ WITH const AS
 		SELECT   6 AS day_id, STR_TO_DATE("12 11 2020","%d %m %Y") AS day_n
 	  )
 SELECT 	ui.leaderID, const.day_n,
-			project_presentation_user.projects, project_presentation_user.presentations,
+			project_presentation_user.presentations,
 			project_tags_user.market, project_tags_user.method, project_tags_user.tech, project_tags_user.task,
 			task_edu_user.Tasks_Created, task_edu_user.Tasks_Done, task_edu_user.Tasks_Validated, task_edu_user.EDUreq_Created, task_edu_user.EDUreq_Done,
 			req_user.axeleration_req, req_user.expert_req, req_user.lab_req, req_user.workshop_req, req_user.pitch_req,
@@ -58,7 +58,7 @@ LEFT JOIN (
 		ON task_edu_user.leaderID=ui.leaderID	AND task_edu_user.day_n=const.day_n
 LEFT JOIN (			
 				SELECT  	ui.leaderID, const.day_n, SUM(at.typeID=1146) AS axeleration_req, SUM(at.typeID=1147) AS expert_req, SUM(at.typeID=1149) AS lab_req, 
-							SUM(at.typeID=1149) AS workshop_req, SUM(at.typeID=1151) AS pitch_req
+							SUM(at.typeID=1149) AS workshop_req, SUM(at.typeID=1150) AS effic_req, SUM(at.typeID=1151) AS pitch_req
 				FROM  const, labs.user_activity_request uar
 				LEFT JOIN labs.run r ON uar.runID=r.id 
 				LEFT JOIN labs.activity AS a ON r.activityID = a.id
@@ -67,7 +67,7 @@ LEFT JOIN (
  		      LEFT JOIN labs.event e ON e.runID=r.id
 		      LEFT JOIN labs.timeslot AS ts ON ts.id=e.timeslotID
          	LEFT JOIN labs.user_info as ui ON ui.userID=uar.userID AND ui.untiID IS NOT Null
-				WHERE ca.contextID=355 AND at.typeID IN (1146,1147,1148,1149,1151) AND ts.startDT>=const.day_n AND ts.startDT<const.day_n+1 
+				WHERE ca.contextID=355 AND at.typeID IN (1146,1147,1148,1149,1150,1151) AND ts.startDT>=const.day_n AND ts.startDT<const.day_n+1 
 				GROUP BY ui.leaderID, const.day_n
 			) AS req_user
 		ON req_user.leaderID=ui.leaderID	AND req_user.day_n=const.day_n
@@ -243,4 +243,5 @@ WHERE ui.leaderID in
 985926,	1137553,	122480,	337114,	1471515,	1543530,	293486,	483419,	322719,	108365,	1648743,	1550562,	1716975,	1566387,	241895,	35224,	1392809,	1602227,	1644731,	
 1522754,	873720,	585554,	1186,		1587062,	1832248,	480994,	34720,	1101766,	343304,	383074,	363852,	1600158,	1537029,	307132,	258304,	1693082,	263083,	1732899,								
 1562200,	1692443,	1511145,	1772417,	1267629,	1252083,	1826925,	1394990,	616995,	1662841,	479366,	495213,	1578771,	78225,	68892,	1526404,	317326, 	921024,	355304)		
-GROUP BY ui.leaderID, const.day_n;
+GROUP BY ui.leaderID, const.day_n
+ORDER BY ui.leaderID, const.day_n;
