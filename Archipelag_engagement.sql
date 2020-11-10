@@ -13,7 +13,7 @@ SELECT 	ui.leaderID, const.day_n AS День,
 			task_edu_user.Tasks_Done AS 'Выполнена задача в ком.профиле', 
 			task_edu_user.Tasks_Validated AS 'Верифицировано решение в ком.профиле', 
 			task_edu_user.EDUreq_Created AS 'Создание Темы изучения в Ком.профиле', 
-			task_edu_user.EDUreq_Done AS 'Оценено продвижение к цели в ЛК',
+			task_edu_user.EDUreq_Done AS 'Закрыта Тема изучения в Ком.профиле',
 			req_user.axeleration_req AS 'Запись на Акслератор', 
 			req_user.expert_req AS 'Запись на встречу с экспертом', 
 			req_user.lab_req AS 'Запись на Лабораторию', 
@@ -46,7 +46,7 @@ LEFT JOIN (
 			) as project_presentation_user
 		ON project_presentation_user.leaderID=ui.leaderID AND project_presentation_user.day_n=const.day_n
 LEFT JOIN (
-				SELECT leaderID, day_n, IF(market>0 AND method>0 AND tech>0 and task>0,1,0) AS project_marked
+				SELECT leaderID, day_n, IF(market>0 OR method>0 OR tech>0 OR task>0,1,0) AS project_marked
 				FROM (
 								SELECT  ui.leaderID, const.day_n, p.id AS p_id,
 								SUM(pt.type='market') AS market,	SUM(pt.type='method') AS method,	SUM(pt.type='tech') AS tech, SUM(pt.type='task') AS task
@@ -75,7 +75,7 @@ LEFT JOIN (
 		ON task_edu_user.leaderID=ui.leaderID	AND task_edu_user.day_n=const.day_n
 LEFT JOIN (			
 				SELECT  	ui.leaderID, const.day_n, SUM(at.typeID=1146) AS axeleration_req, SUM(at.typeID=1147) AS expert_req, SUM(at.typeID=1149) AS lab_req, 
-							SUM(at.typeID=1149) AS workshop_req, SUM(at.typeID=1150) AS effic_req, SUM(at.typeID=1151) AS pitch_req
+							SUM(at.typeID=1149) AS workshop_req, SUM(at.typeID=1164) AS effic_req, SUM(at.typeID=1151) AS pitch_req
 				FROM  const, labs.user_activity_request uar
 				LEFT JOIN labs.run r ON uar.runID=r.id 
 				LEFT JOIN labs.activity AS a ON r.activityID = a.id
@@ -84,7 +84,7 @@ LEFT JOIN (
  		      LEFT JOIN labs.event e ON e.runID=r.id
 		      LEFT JOIN labs.timeslot AS ts ON ts.id=e.timeslotID
          	LEFT JOIN labs.user_info as ui ON ui.userID=uar.userID AND ui.untiID IS NOT Null
-				WHERE ca.contextID=355 AND at.typeID IN (1146,1147,1148,1149,1150,1151) AND ts.startDT>=const.day_n AND ts.startDT<const.day_n+1 
+				WHERE ca.contextID=355 AND at.typeID IN (1146,1147,1148,1149,1164,1151) AND ts.startDT>=const.day_n AND ts.startDT<const.day_n+1 
 				GROUP BY ui.leaderID, const.day_n
 			) AS req_user
 		ON req_user.leaderID=ui.leaderID	AND req_user.day_n=const.day_n
