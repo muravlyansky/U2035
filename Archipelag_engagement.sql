@@ -25,7 +25,9 @@ SELECT 	ui.leaderID, const.day_n AS День,
 			event_fb.event_feedbacks AS 'Оставлен Фидбек на мероприятие (хотя бы один ответ)',
 			products.products AS 'Создан Продукт в Edumap',
 			project_like.project_like AS 'Поставлен лайк проекту в ПТ',
-			product_like.product_like AS 'Поставлен лайк продукту (карточке) в Edumap'
+			product_like.product_like AS 'Поставлен лайк продукту (карточке) в Edumap',
+			vacancy_created.vacancy_count AS 'Создано вакансий',
+			vacancy_respond.vacancy_count AS 'Откликов на вакансии'
 FROM  labs.user_info AS ui 
 JOIN const
 LEFT JOIN ( 
@@ -148,7 +150,26 @@ LEFT JOIN (
 				WHERE pur.createDT>=const.day_n AND pur.createDT<const.day_n+1 
 				GROUP BY ui.leaderID, const.day_n
 			 ) AS product_like		
-		ON product_like.leaderID=ui.leaderID	AND product_like.day_n=const.day_n													
+		ON product_like.leaderID=ui.leaderID	AND product_like.day_n=const.day_n	
+LEFT JOIN (
+				SELECT ui.leaderID, const.day_n, COUNT(pvr.vacancyID) AS vacancy_count
+				FROM people.project_vacancy_respond AS pvr 
+				JOIN const
+				LEFT JOIN people.user_info AS ui ON pvr.userID=ui.userID AND ui.leaderID IS NOT null
+				WHERE pvr.createDT>=const.day_n AND pvr.createDT<const.day_n+1 
+				GROUP BY ui.leaderID, const.day_n
+			) AS 		vacancy_respond
+		ON vacancy_respond.leaderID=ui.leaderID	AND vacancy_respond.day_n=const.day_n	
+LEFT JOIN (
+				SELECT ui.leaderID, const.day_n, SUM(pv.active) - SUM(pv.isDeleted) AS vacancy_count
+				FROM people.project_vacancy AS pv 
+				JOIN const
+				LEFT JOIN people.project_team AS pt ON pt.projectID=pv.projectID
+				LEFT JOIN people.team_user AS tu ON tu.teamID=pt.teamID
+				LEFT JOIN people.user_info AS ui ON tu.userID=ui.userID AND ui.leaderID IS NOT null
+				WHERE pv.createDT>=const.day_n AND pv.createDT<const.day_n+1 AND tu.role='leader' 
+				GROUP BY ui.leaderID, const.day_n) AS vacancy_created		
+		ON vacancy_created.leaderID=ui.leaderID	AND vacancy_created.day_n=const.day_n																	
 WHERE ui.leaderID in
 (485453,	1651791,	1763835,	36694,	83592,	1578656,	339301,	1549642,	1135084,	474779,	1441162,	547916,	1598284,	1213499,	688,		608607,	477027,	1139596,	1146066,	237990,
 474811,	1564558,	1660183,	320437,	1844982,	1267617,	239714,	991815,	1676018,	685911,	836995,	74452,	716652,	40435,	1561513,	1030706,	1399757,	285185,	441225,	1528761,
