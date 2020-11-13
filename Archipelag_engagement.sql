@@ -4,9 +4,10 @@ WITH const AS
 		SELECT   3 AS day_id, STR_TO_DATE("09 11 2020","%d %m %Y") AS day_n	   UNION
 		SELECT   4 AS day_id, STR_TO_DATE("10 11 2020","%d %m %Y") AS day_n	   UNION
 		SELECT   5 AS day_id, STR_TO_DATE("11 11 2020","%d %m %Y") AS day_n	   UNION
-		SELECT   6 AS day_id, STR_TO_DATE("12 11 2020","%d %m %Y") AS day_n
+		SELECT   6 AS day_id, STR_TO_DATE("12 11 2020","%d %m %Y") AS day_n		UNION
+		SELECT   7 AS day_id, STR_TO_DATE("13 11 2020","%d %m %Y") AS day_n			
 	  )
-SELECT 	ui.leaderID, const.day_n AS День,
+SELECT 	ui.untiID, ui.leaderID, const.day_n AS День,
 			project_presentation_user.presentations AS 'Загружена в PT презентация по проекту',
 			project_tags_user.project_marked AS 'Проект в ПТ размечен', 
 			task_edu_user.Tasks_Created AS 'Участником создана задача в Командном профиле', 
