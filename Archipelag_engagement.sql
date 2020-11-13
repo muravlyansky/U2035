@@ -7,7 +7,7 @@ WITH const AS
 		SELECT   6 AS day_id, STR_TO_DATE("12 11 2020","%d %m %Y") AS day_n		UNION
 		SELECT   7 AS day_id, STR_TO_DATE("13 11 2020","%d %m %Y") AS day_n			
 	  )
-SELECT 	ui.untiID, ui.leaderID, const.day_n AS День,
+SELECT 	 ui.leaderID, const.day_n AS День,
 			project_presentation_user.presentations AS 'Загружена в PT презентация по проекту',
 			project_tags_user.project_marked AS 'Проект в ПТ размечен', 
 			task_edu_user.Tasks_Created AS 'Участником создана задача в Командном профиле', 
@@ -28,7 +28,7 @@ SELECT 	ui.untiID, ui.leaderID, const.day_n AS День,
 			project_like.project_like AS 'Поставлен лайк проекту в ПТ',
 			product_like.product_like AS 'Поставлен лайк продукту (карточке) в Edumap',
 			vacancy_created.vacancy_count AS 'Создано вакансий',
-			vacancy_respond.vacancy_count AS 'Откликов на вакансии'
+			vacancy_respond.vacancy_count AS 'Откликов на вакансии', ui.untiID
 FROM  labs.user_info AS ui 
 JOIN const
 LEFT JOIN ( 
