@@ -216,7 +216,7 @@ WHERE ui.leaderID in
 		Select distinct ui.leaderid AS leaderID from ple.user_info ui
 		left join ple.user_tag ut on ut.userid = ui.userid
 		left join ple.tag t on t.id = ut.tagid
-		WHERE  t.guid like "aw20%"
+		WHERE  t.guid IN ( 'p0_student_ss20', 'p1_aw20_student')
 	) AS list
 )
 GROUP BY ui.leaderID, const.day_n
