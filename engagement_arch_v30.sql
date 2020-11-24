@@ -79,8 +79,10 @@ LEFT JOIN (
 			SELECT sc.untiID , const.day_n, sc.createDT,sc.dt,
 						SUM(sc.status='new' AND sc.type ='task_team') AS Tasks_Created,  
 						SUM(sc.status='done' AND sc.type ='task_team' AND scaf.url IS NOT NULL) AS Tasks_Done,				 
-						SUM(sc.status='validated' AND sc.type ='task_team') AS Tasks_Validated, SUM(sc.status='validated_error' AND sc.type ='task_team') AS Tasks_Validated_error,
-						SUM(sc.status='new' AND sc.type ='focus_team') AS EDUreq_Created,  SUM(sc.status='done' AND sc.type ='focus_team') AS EDUreq_Done
+						SUM(sc.status='validated' AND sc.type ='task_team') AS Tasks_Validated, 
+						SUM(sc.status='validated_error' AND sc.type ='task_team') AS Tasks_Validated_error,
+						SUM(sc.status='new' AND sc.type ='focus_team') AS EDUreq_Created,  
+						SUM(sc.status='done' AND sc.type ='focus_team') AS EDUreq_Done
 				FROM const, ple.step_collection sc
 				LEFT JOIN ple.step_collection_artefact AS sca ON  sca.collectionUuid=sc.uuid
 				LEFT JOIN ple.step_collection_artefact_files AS scaf ON scaf.artefactID=sca.uuid
