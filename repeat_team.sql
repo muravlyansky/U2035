@@ -9,10 +9,10 @@ WITH uid as (	SELECT ui.untiID
 					GROUP BY ui.untiID
 					HAVING count(distinct ct.contextID)>1 
 		) 
-SELECT 	team_list AS teamID_list, GROUP_CONCAT(distinct uid_untiID) AS untiID_list	
+SELECT 	team_list AS teamID_list, contextID_list, GROUP_CONCAT(distinct uid_untiID) AS untiID_list	
 FROM (		
 		SELECT uid.untiID AS uid_untiID, ui.untiID, count(distinct tu.teamID) AS count_teams, count(distinct ct.contextID) AS count_context, 
-				 GROUP_CONCAT(distinct tu.teamID) AS team_list
+				 GROUP_CONCAT(distinct tu.teamID) AS team_list, GROUP_CONCAT(distinct ct.contextID) AS contextID_list
 		FROM uid, people.team_user AS tu
 		LEFT JOIN people.user_info AS ui ON tu.userID=ui.userID
 		LEFT JOIN people.team AS t ON tu.teamID=t.id
