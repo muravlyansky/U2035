@@ -92,7 +92,7 @@ LEFT JOIN (
 		ON task_edu_user.untiID=ui.untiID	AND task_edu_user.day_n=const.day_n
 LEFT JOIN (			
 				SELECT  	ui.leaderID, const.day_n, SUM(at.typeID=1146) AS axeleration_req, SUM(at.typeID=1147) AS expert_req, SUM(at.typeID=1149) AS lab_req, 
-							SUM(at.typeID=1149) AS workshop_req, SUM(at.typeID=1164) AS effic_req, SUM(at.typeID=1151) AS pitch_req
+							SUM(at.typeID=1148) AS workshop_req, SUM(at.typeID=1164) AS effic_req, SUM(at.typeID=1151) AS pitch_req
 				FROM  const, labs.user_activity_request uar
 				LEFT JOIN labs.run r ON uar.runID=r.id 
 				LEFT JOIN labs.activity AS a ON r.activityID = a.id
